@@ -118,6 +118,36 @@ class ElectricFieldApp(tk.Tk):
         self.plot_field(R, x, E, 'Disco')
 
 # ---------------------------------------------------------------------------------
+# Calculo de campo electrico la linea de carga 
+
+    def electric_field_line(self, l, x, Q):
+        kappa = 8.988e9  # Constante de Coulomb
+        lambda_ = Q / l  # Densidad lineal de carga
+
+        def integrand(y, x):
+            dL = 1  # Elemento diferencial de longitud
+            dQ = lambda_ * dL  # Elemento diferencial de carga
+            return kappa * dQ * x / (x**2 + y**2)**(3/2)
+    
+        E, _ = quad(integrand, -l/2, l/2, args=(x,))
+        E_int = round(E)
+        self.label_result.config(text=f"Campo Eléctrico: {E_int:,} N/C")
+        self.plot_field(l, x, E, 'Línea de carga')
+
+# ---------------------------------------------------------------------------------
+    def plot_field(self, param, x, E, dtype):
+        fig, ax = plt.subplots()
+        
+        if dtype == 'Anillo':
+            circle = plt.Circle((0, 0), param, color='blue', fill=False)
+            ax.add_patch(circle)
+        elif dtype == 'Disco':
+            circle = plt.Circle((0, 0), param, color='blue', fill=True)
+            ax.add_patch(circle)
+        elif dtype == 'Línea de carga':
+            line = plt.Line2D([0, 0], [-param/2, param/2], color='blue')
+            ax.add_line(line)
+    
 
 # ---------------------------------------------------------------------------------
 
