@@ -85,6 +85,39 @@ class ElectricFieldApp(tk.Tk):
         elif self.combo.get() == "Línea de carga":
             self.electric_field_line(float(self.entry_param.get()), float(self.entry_position.get()), Q)
 
+# ---------------------------------------------------------------------------------
+# Calculo de campo electrico de anillo
+
+    def electric_field_anillo(self, a, x, Q):
+        kappa = 8.988e9  # Constante de Coulomb
+        lambda_ = Q / (2 * np.pi * a)  # Densidad de carga lineal
+
+        def integrand(dl, a, x, kappa, lambda_):
+            return kappa * lambda_ * x / (a**2 + x**2)**(1.5)
+
+        E, _ = quad(integrand, 0, 2*np.pi*a, args=(a, x, kappa, lambda_), epsabs=1.49e-12,epsrel=1.49e-12)
+        E_int = round(E)
+        self.label_result.config(text=f"Campo Eléctrico: {E_int:,} N/C")
+        self.plot_field(a, x, E, 'Anillo')
+
+# ---------------------------------------------------------------------------------
+# Calculo de campo electrico del disco
+
+    def electric_field_disco(self, R, x, Q):
+        kappa = 8.988e9  # Constante de Coulomb
+        sigma = Q / (np.pi * R**2)  # Densidad superficial de carga
+
+        def integrand(r, x):
+            dA = 2 * np.pi * r  # Elemento diferencial de Area
+            dQ = sigma * dA  # Elemento diferencial de carga
+            return kappa * dQ * x / (r**2 + x**2)**(3/2)
+            
+        E, _ = quad(integrand, 0, R, args=(x,))
+        E_int = round(E)
+        self.label_result.config(text=f"Campo Eléctrico: {E_int:,} N/C")
+        self.plot_field(R, x, E, 'Disco')
+
+# ---------------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------------
 
